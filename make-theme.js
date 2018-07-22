@@ -103,17 +103,33 @@ function renderHeader(resume) {
 }
 
 /**
+ * Render the resume summary.
+ *
+ * @param {Resume} resume The resume data.
+ * @returns {string} The rendered summary.
+ */
+function renderSummary(resume) {
+  const summary = resume.basics.summary;
+
+  return summary
+    ? `\\summary{${summary}}`
+    : '\\ignorespaces % Summary would go here';
+}
+
+/**
  * The default options to use for the renderer.
  *
  * @typedef {Object} RenderOptions
  * @property {string} documentClass The documentclass to use for the output.
  * @property {string} preamble The preamble to use in the output.
  * @property {function(Resume): string} renderHeader The function to use for rendering the header.
+ * @property {function(Resume): string} renderSummary The function to use for rendering the summary.
  */
 const defaultOptions = {
   documentClass: 'article',
   preamble: '',
   renderHeader,
+  renderSummary,
 };
 
 /**
@@ -132,6 +148,7 @@ function makeTheme(options = defaultOptions) {
 ${options.preamble}
 \\begin{document}
 ${options.renderHeader(resume)}
+${options.renderSummary(resume)}
 \\end{document}
 `;
   };
