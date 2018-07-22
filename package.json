@@ -1,0 +1,16 @@
+{
+  "name": "jsonresume-theme-latex",
+  "version": "0.1.0",
+  "description": "A LaTeX theme/output format for JSON resumes.",
+  "main": "index.js",
+  "repository": "https://github.com/ianprime0509/jsonresume-theme-latex",
+  "author": {
+    "name": "Ian Johnson",
+    "email": "ianprime0509@gmail.com"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^5.2.0",
+    "prettier": "^1.13.7"
+  }
+}
