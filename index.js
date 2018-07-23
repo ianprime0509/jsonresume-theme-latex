@@ -21,6 +21,7 @@ function escape(str) {
   // TODO: complete the implementation by filling in more escapes.
   const escapes = {
     '\n': ' \\\\ ',
+    ' - ': ' --- ',
   };
   const escapeRegex = new RegExp(Object.keys(escapes).join('|'), 'g');
 
@@ -242,6 +243,50 @@ function renderVolunteer(volunteer) {
 }
 
 /**
+ * Render the education section.
+ *
+ * @param {Array.<School>} education The education section of the resume.
+ * @returns {string} The formatted section.
+ */
+function renderEducation(education) {
+  if (!education) {
+    return '% Education section omitted.';
+  }
+
+  let formattedSchools = [];
+  for (const school of education) {
+    const startDate = moment(school.startDate).format('YYYY');
+    const endDate = school.endDate
+      ? moment(school.endDate).format('YYYY')
+      : 'Present';
+    const degree = `${school.studyType} (${school.area})`;
+    const gpa = school.gpa ? `GPA: ${escape(school.gpa)}` : '';
+    // The arguments have to be passed to the environment in a certain order:
+    // 1. Institution
+    // 2. Degree
+    // 3. Date range
+    // 4. GPA
+    const args = [
+      escape(school.institution),
+      escape(degree),
+      `${startDate}--${endDate}`,
+      escape(gpa),
+    ];
+
+    const schoolInfo = school.courses
+      ? useEnvironment(
+          'courses',
+          school.courses.map(course => `\\item ${escape(course)}`).join('\n')
+        )
+      : '';
+
+    formattedSchools.push(useEnvironment('school', schoolInfo, ...args));
+  }
+
+  return useEnvironment('education', formattedSchools.join('\n'));
+}
+
+/**
  * The default options to use for the renderer.
  *
  * @typedef {Object} RenderOptions
@@ -251,6 +296,7 @@ function renderVolunteer(volunteer) {
  * @property {function(string): string} renderSummary The function to use for rendering the summary.
  * @property {function(Work): string} renderWork The function to use for rendering the work section.
  * @property {function(Volunteer): string} renderVolunteer The function to use for rendering the volunteer section.
+ * @property {function(Education): string} renderEducation The function to use for rendering the education section.
  */
 const defaultOptions = {
   documentClass: 'article',
@@ -259,6 +305,7 @@ const defaultOptions = {
   renderSummary,
   renderWork,
   renderVolunteer,
+  renderEducation,
 };
 
 /**
@@ -280,6 +327,7 @@ ${options.renderHeader(resume)}
 ${options.renderSummary(resume.basics.summary)}
 ${options.renderWork(resume.work)}
 ${options.renderVolunteer(resume.volunteer)}
+${options.renderEducation(resume.education)}
 \\end{document}
 `;
   };

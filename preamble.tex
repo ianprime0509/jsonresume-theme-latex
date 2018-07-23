@@ -9,7 +9,7 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0pt}
 % Lists
-\setlist{nosep}
+\setlist{noitemsep, topsep=0pt, parsep=1ex}
 \renewcommand{\labelitemi}{--}
 % Titles
 \titlespacing{\section}{0pt}{2ex}{1ex}
@@ -17,7 +17,7 @@
 % General formatting commands
 \newcommand{\quadheader}[4]{%
   \textbf{#1 \hfill #2}\par\nopagebreak%
-  \textit{#3 \hfill #4}\par\nopagebreak%
+  \textit{#3 \hfill #4}\par\smallskip\nopagebreak%
 }
 
 % Header commands
@@ -41,8 +41,8 @@
 % 2. Position
 % 3. Date range
 % 4. Location
-\newenvironment{job}[4]{\quadheader{#2}{#3}{#1}{#4}\smallskip}{}
-\newenvironment{jobhighlights}{\begin{itemize}}{\end{itemize}\smallskip}
+\newenvironment{job}[4]{\quadheader{#2}{#3}{#1}{#4}}{}
+\newenvironment{jobhighlights}{\begin{itemize}}{\end{itemize}}
 \newcommand{\jobsummary}[1]{{#1}\par\smallskip}
 
 % Volunteer
@@ -52,7 +52,17 @@
 % 2. Position
 % 3. Date range
 % 4. Location
-\newenvironment{position}[4]{\quadheader{#2}{#3}{#1}{#4}\smallskip}{}
-\newenvironment{positionhighlights}{\begin{itemize}}{\end{itemize}\smallskip}
+\newenvironment{position}[4]{\quadheader{#2}{#3}{#1}{#4}}{}
+\newenvironment{positionhighlights}{\begin{itemize}}{\end{itemize}}
 \newcommand{\positionsummary}[1]{{#1}\par\smallskip}
+
+% Education
+\newenvironment{education}{\section*{Education}}{\par\pagebreak[1]}
+% Arguments:
+% 1. Institution
+% 2. Degree
+% 3. Date range
+% 4. GPA
+\newenvironment{school}[4]{\quadheader{#1}{#3}{#2}{#4}}{}
+\newenvironment{courses}{\begin{itemize}}{\end{itemize}}
 %%% End resume preamble.
