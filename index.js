@@ -287,6 +287,10 @@ function renderEducation(education) {
 }
 
 /**
+ * @typedef {Object} SectionOptions
+ * @property {function(Object): string} render The function to use to render this section.
+ */
+/**
  * The default options to use for the renderer.
  *
  * @typedef {Object} RenderOptions
@@ -294,18 +298,26 @@ function renderEducation(education) {
  * @property {string} preamble The preamble to use in the output.
  * @property {function(Resume): string} renderHeader The function to use for rendering the header.
  * @property {function(string): string} renderSummary The function to use for rendering the summary.
- * @property {function(Work): string} renderWork The function to use for rendering the work section.
- * @property {function(Volunteer): string} renderVolunteer The function to use for rendering the volunteer section.
- * @property {function(Education): string} renderEducation The function to use for rendering the education section.
+ * @property {Array.<string>} sections The sections to output, in the order they should appear.
+ * @property {Object.<string, SectionOptions>} sectionOptions Options for each section.
  */
 const defaultOptions = {
   documentClass: 'article',
   preamble: '',
   renderHeader,
   renderSummary,
-  renderWork,
-  renderVolunteer,
-  renderEducation,
+  sections: ['work', 'volunteer', 'education'],
+  sectionOptions: {
+    work: {
+      render: renderWork,
+    },
+    volunteer: {
+      render: renderVolunteer,
+    },
+    education: {
+      render: renderEducation,
+    },
+  },
 };
 
 /**
@@ -325,9 +337,9 @@ ${options.preamble}
 \\begin{document}
 ${options.renderHeader(resume)}
 ${options.renderSummary(resume.basics.summary)}
-${options.renderWork(resume.work)}
-${options.renderVolunteer(resume.volunteer)}
-${options.renderEducation(resume.education)}
+${options.sections
+      .map(section => options.sectionOptions[section].render(resume[section]))
+      .join('\n')}
 \\end{document}
 `;
   };
