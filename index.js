@@ -17,6 +17,9 @@ const path = require('path');
  * @returns {string} The escaped string.
  */
 function escape(str) {
+  if (!str) {
+    return '';
+  }
   // Uses the approach described in https://stackoverflow.com/a/15604206.
   // TODO: complete the implementation by filling in more escapes.
   const escapes = {
@@ -158,7 +161,7 @@ function renderWork(work) {
       escape(company),
       escape(job.position),
       `${startDate}--${endDate}`,
-      escape(job.location || ''),
+      escape(job.location),
     ];
 
     // Output the summary and highlights.
@@ -215,7 +218,7 @@ function renderVolunteer(volunteer) {
       escape(organization),
       escape(position.position),
       `${startDate}--${endDate}`,
-      escape(position.location || ''),
+      escape(position.location),
     ];
 
     // Output the summary and highlights.
@@ -287,11 +290,39 @@ function renderEducation(education) {
 }
 
 /**
- * @typedef {Object} SectionOptions
- * @property {function(Object): string} render The function to use to render this section.
+ * Render the awards section.
+ *
+ * @param {Array.<Award>} awards The awards section of the resume.
+ * @returns {string} The formatted section.
  */
+function renderAwards(awards) {
+  if (!awards) {
+    return '% Awards section omitted.';
+  }
+
+  let formattedAwards = [];
+  for (const award of awards) {
+    const date = moment(award.date).format('MMMM DD, YYYY');
+    // Arguments to the award environment:
+    // 1. Award title
+    // 2. Date
+    // 3. Awarder
+    const args = [escape(award.title), date, escape(award.awarder)];
+
+    const awardInfo = award.summary
+      ? `\\awardsummary{${escape(award.summary)}}`
+      : '';
+    formattedAwards.push(useEnvironment('award', awardInfo, ...args));
+  }
+
+  return useEnvironment('awards', formattedAwards.join('\n'));
+}
+
 /**
  * The default options to use for the renderer.
+ *
+ * @typedef {Object} SectionOptions
+ * @property {function(Object): string} render The function to use to render this section.
  *
  * @typedef {Object} RenderOptions
  * @property {string} documentClass The documentclass to use for the output.
@@ -300,13 +331,15 @@ function renderEducation(education) {
  * @property {function(string): string} renderSummary The function to use for rendering the summary.
  * @property {Array.<string>} sections The sections to output, in the order they should appear.
  * @property {Object.<string, SectionOptions>} sectionOptions Options for each section.
+ *
+ * @type {RenderOptions}
  */
 const defaultOptions = {
   documentClass: 'article',
   preamble: '',
   renderHeader,
   renderSummary,
-  sections: ['work', 'volunteer', 'education'],
+  sections: ['work', 'volunteer', 'education', 'awards'],
   sectionOptions: {
     work: {
       render: renderWork,
@@ -316,6 +349,9 @@ const defaultOptions = {
     },
     education: {
       render: renderEducation,
+    },
+    awards: {
+      render: renderAwards,
     },
   },
 };
