@@ -17,8 +17,14 @@ const path = require('path');
  * @returns {string} The escaped string.
  */
 function escape(str) {
-  // TODO: complete the implementation.
-  return str;
+  // Uses the approach described in https://stackoverflow.com/a/15604206.
+  // TODO: complete the implementation by filling in more escapes.
+  const escapes = {
+    '\n': ' \\\\ ',
+  };
+  const escapeRegex = new RegExp(Object.keys(escapes).join('|'), 'g');
+
+  return str.replace(escapeRegex, matched => escapes[matched]);
 }
 
 /**
@@ -81,15 +87,15 @@ function renderHeader(resume) {
   const basics = resume.basics;
   const { name, label, email, phone, website, location } = resume.basics;
 
-  let contents = [`\\name{${name}}`];
+  let contents = [`\\name{${escape(name)}}`];
   if (label) {
-    contents.push(`\\personallabel{${label}}`);
+    contents.push(`\\personallabel{${escape(label)}}`);
   }
   if (location) {
     contents.push(
-      `\\location{${location.address.replace('\n', ' \\\\ ')} \\\\ ${
+      `\\location{${escape(location.address)} \\\\ ${escape(
         location.city
-      }, ${location.postalCode}}`
+      )}, ${escape(location.postalCode)}}`
     );
   }
   if (email) {
@@ -114,7 +120,9 @@ function renderHeader(resume) {
  * @returns {string} The rendered summary.
  */
 function renderSummary(summary) {
-  return summary ? `\\summary{${summary}}` : '% Summary section omitted.';
+  return summary
+    ? `\\summary{${escape(summary)}}`
+    : '% Summary section omitted.';
 }
 
 /**
@@ -134,9 +142,11 @@ function renderWork(work) {
     const endDate = job.endDate
       ? moment(job.endDate).format('MMMM YYYY')
       : 'Present';
-    let company = job.url ? `\\href{${job.company}}{${job.url}}` : job.company;
+    let company = job.url
+      ? `\\href{${job.url}}{${escape(job.company)}}`
+      : escape(job.company);
     if (job.description) {
-      company += ` ${job.description}`;
+      company += ` ${escape(job.description)}`;
     }
     // The arguments have to be passed to the environment in a certain order:
     // 1. Company
@@ -144,22 +154,24 @@ function renderWork(work) {
     // 3. Date range
     // 4. Location
     const args = [
-      company,
-      job.position,
+      escape(company),
+      escape(job.position),
       `${startDate}--${endDate}`,
-      job.location || '',
+      escape(job.location || ''),
     ];
 
     // Output the summary and highlights.
     let jobInfo = [];
     if (job.summary) {
-      jobInfo.push(`\\jobsummary{${job.summary}}`);
+      jobInfo.push(`\\jobsummary{${escape(job.summary)}}`);
     }
     if (job.highlights) {
       jobInfo.push(
         useEnvironment(
           'jobhighlights',
-          job.highlights.map(highlight => `\\item ${highlight}`).join('\n')
+          job.highlights
+            .map(highlight => `\\item ${escape(highlight)}`)
+            .join('\n')
         )
       );
     }
