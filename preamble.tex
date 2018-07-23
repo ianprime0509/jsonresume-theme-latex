@@ -1,10 +1,26 @@
 %%% Begin resume preamble.
-\usepackage[margin=1in]{geometry}
-\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
 
-\newenvironment{header}{\begin{center}}{\end{center}}
+\usepackage[hidelinks]{hyperref}
+\usepackage[margin=1in]{geometry}
+
+% General formatting settings
+\setlength{\parindent}{0cm}
+% Lists
+\setlist{nosep}
+\renewcommand{\labelitemi}{--}
+% Titles
+\titlespacing{\section}{0pt}{2ex}{1ex}
+
+% General formatting commands
+\newcommand{\quadheader}[4]{%
+  \textbf{#1 \hfill #2}\par%
+  \textit{#3 \hfill #4}\par%
+}
 
 % Header commands
+\newenvironment{header}{\begin{center}}{\end{center}}
 \newcommand{\name}[1]{{\LARGE\bfseries #1}\par\medskip}
 \newcommand{\personallabel}[1]{{\large\bfseries #1}\par\smallskip}
 \newcommand{\email}[1]{\textbf{Email:} \href{mailto:#1}{\nolinkurl{#1}}\par}
@@ -14,4 +30,15 @@
 
 % Summary
 \newcommand{\summary}[1]{{#1}\par}
+
+% Work
+\newenvironment{work}{\section*{Work}}{\par}
+% Arguments:
+% 1. Company
+% 2. Position
+% 3. Date range
+% 4. Location
+\newenvironment{job}[4]{\quadheader{#2}{#3}{#1}{#4}\smallskip}{}
+\newenvironment{jobhighlights}{\begin{itemize}}{\end{itemize}\smallskip}
+\newcommand{\jobsummary}[1]{{#1}\par\smallskip}
 %%% End resume preamble.

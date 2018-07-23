@@ -8,6 +8,8 @@
  * found in the LICENSE file in the project root, or at
  * https://opensource.org/licenses/MIT.
  */
+const moment = require('moment');
+
 /**
  * Escape any LaTeX special characters in the given string.
  *
@@ -37,10 +39,11 @@ function indent(code) {
  *
  * @param {string} env The environment to use.
  * @param {string} code The code to enclose.
+ * @param {...string} args Any arguments to pass to the environment.
  * @returns {string} The code within the environment.
  */
-function useEnvironment(env, code) {
-  return `\\begin{${env}}
+function useEnvironment(env, code, ...args) {
+  return `\\begin{${env}}${args.map(arg => `{${arg}}`).join('')}
 ${indent(code)}
 \\end{${env}}`;
 }
@@ -78,42 +81,93 @@ function renderHeader(resume) {
   const basics = resume.basics;
   const { name, label, email, phone, website, location } = resume.basics;
 
-  let contents = `\\name{${name}}\n`;
+  let contents = [`\\name{${name}}`];
   if (label) {
-    contents += `\\personallabel{${label}}\n`;
+    contents.push(`\\personallabel{${label}}`);
   }
   if (location) {
-    contents += `\\location{${location.address.replace('\n', ' \\\\ ')} \\\\ ${
-      location.city
-    }, ${location.postalCode}}\n`;
+    contents.push(
+      `\\location{${location.address.replace('\n', ' \\\\ ')} \\\\ ${
+        location.city
+      }, ${location.postalCode}}`
+    );
   }
   if (email) {
-    contents += `\\email{${email}}\n`;
+    contents.push(`\\email{${email}}`);
   }
   if (phone) {
     const rawPhone = phone.replace(/[^+0-9]/g, '');
     const formattedPhone = formatPhone(rawPhone);
-    contents += `\\phone{${rawPhone}}{${formattedPhone}}\n`;
+    contents.push(`\\phone{${rawPhone}}{${formattedPhone}}`);
   }
   if (website) {
-    contents += `\\website{${website}}\n`;
+    contents.push(`\\website{${website}}`);
   }
 
-  return useEnvironment('header', contents.trim());
+  return useEnvironment('header', contents.join('\n'));
 }
 
 /**
  * Render the resume summary.
  *
- * @param {Resume} resume The resume data.
+ * @param {string} summary The summary to render.
  * @returns {string} The rendered summary.
  */
-function renderSummary(resume) {
-  const summary = resume.basics.summary;
+function renderSummary(summary) {
+  return summary ? `\\summary{${summary}}` : '% Summary section omitted.';
+}
 
-  return summary
-    ? `\\summary{${summary}}`
-    : '\\ignorespaces % Summary would go here';
+/**
+ * Render the work section.
+ *
+ * @param {Array.<Job>} work The work section of the resume.
+ * @returns {string} The formatted section.
+ */
+function renderWork(work) {
+  if (!work) {
+    return '% Work section omitted.';
+  }
+
+  let formattedJobs = [];
+  for (const job of work) {
+    const startDate = moment(job.startDate).format('MMMM YYYY');
+    const endDate = job.endDate
+      ? moment(job.endDate).format('MMMM YYYY')
+      : 'Present';
+    let company = job.url ? `\\href{${job.company}}{${job.url}}` : job.company;
+    if (job.description) {
+      company += ` ${job.description}`;
+    }
+    // The arguments have to be passed to the environment in a certain order:
+    // 1. Company
+    // 2. Position
+    // 3. Date range
+    // 4. Location
+    const args = [
+      company,
+      job.position,
+      `${startDate}--${endDate}`,
+      job.location || '',
+    ];
+
+    // Output the summary and highlights.
+    let jobInfo = [];
+    if (job.summary) {
+      jobInfo.push(`\\jobsummary{${job.summary}}`);
+    }
+    if (job.highlights) {
+      jobInfo.push(
+        useEnvironment(
+          'jobhighlights',
+          job.highlights.map(highlight => `\\item ${highlight}`).join('\n')
+        )
+      );
+    }
+
+    formattedJobs.push(useEnvironment('job', jobInfo.join('\n'), ...args));
+  }
+
+  return useEnvironment('work', formattedJobs.join('\n'));
 }
 
 /**
@@ -123,13 +177,15 @@ function renderSummary(resume) {
  * @property {string} documentClass The documentclass to use for the output.
  * @property {string} preamble The preamble to use in the output.
  * @property {function(Resume): string} renderHeader The function to use for rendering the header.
- * @property {function(Resume): string} renderSummary The function to use for rendering the summary.
+ * @property {function(string): string} renderSummary The function to use for rendering the summary.
+ * @property {function(Work): string} renderWork The function to use for rendering the work section.
  */
 const defaultOptions = {
   documentClass: 'article',
   preamble: '',
   renderHeader,
   renderSummary,
+  renderWork,
 };
 
 /**
@@ -148,7 +204,8 @@ function makeTheme(options = defaultOptions) {
 ${options.preamble}
 \\begin{document}
 ${options.renderHeader(resume)}
-${options.renderSummary(resume)}
+${options.renderSummary(resume.basics.summary)}
+${options.renderWork(resume.work)}
 \\end{document}
 `;
   };
