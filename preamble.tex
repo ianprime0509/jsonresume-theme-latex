@@ -6,7 +6,8 @@
 \usepackage[margin=1in]{geometry}
 
 % General formatting settings
-\setlength{\parindent}{0cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
 % Lists
 \setlist{nosep}
 \renewcommand{\labelitemi}{--}
@@ -15,24 +16,26 @@
 
 % General formatting commands
 \newcommand{\quadheader}[4]{%
-  \textbf{#1 \hfill #2}\par%
-  \textit{#3 \hfill #4}\par%
+  \textbf{#1 \hfill #2}\par\nopagebreak%
+  \textit{#3 \hfill #4}\par\nopagebreak%
 }
 
 % Header commands
 \newenvironment{header}{\begin{center}}{\end{center}}
-\newcommand{\name}[1]{{\LARGE\bfseries #1}\par\medskip}
-\newcommand{\personallabel}[1]{{\large\bfseries #1}\par\smallskip}
-\newcommand{\email}[1]{\textbf{Email:} \href{mailto:#1}{\nolinkurl{#1}}\par}
-\newcommand{\phone}[2]{\textbf{Phone:} \href{tel:#1}{#2}\par}
-\newcommand{\website}[1]{\textbf{Website:} \url{#1}\par}
-\newcommand{\location}[1]{{#1}\par\smallskip}
+\newcommand{\name}[1]{{\LARGE\bfseries #1}\par\medskip\nopagebreak}
+\newcommand{\personallabel}[1]{{\large\bfseries #1}\par\smallskip\nopagebreak}
+\newcommand{\email}[1]{%
+  \textbf{Email:} \href{mailto:#1}{\nolinkurl{#1}}\par\nopagebreak%
+}
+\newcommand{\phone}[2]{\textbf{Phone:} \href{tel:#1}{#2}\par\nopagebreak}
+\newcommand{\website}[1]{\textbf{Website:} \url{#1}\par\nopagebreak}
+\newcommand{\location}[1]{{#1}\par\smallskip\nopagebreak}
 
 % Summary
-\newcommand{\summary}[1]{{#1}\par}
+\newcommand{\summary}[1]{{#1}\par\smallskip\pagebreak[1]}
 
 % Work
-\newenvironment{work}{\section*{Work}}{\par}
+\newenvironment{work}{\section*{Work}}{\par\pagebreak[1]}
 % Arguments:
 % 1. Company
 % 2. Position
@@ -41,4 +44,15 @@
 \newenvironment{job}[4]{\quadheader{#2}{#3}{#1}{#4}\smallskip}{}
 \newenvironment{jobhighlights}{\begin{itemize}}{\end{itemize}\smallskip}
 \newcommand{\jobsummary}[1]{{#1}\par\smallskip}
+
+% Volunteer
+\newenvironment{volunteer}{\section*{Volunteer}}{\par\pagebreak[1]}
+% Arguments:
+% 1. Organization
+% 2. Position
+% 3. Date range
+% 4. Location
+\newenvironment{position}[4]{\quadheader{#2}{#3}{#1}{#4}\smallskip}{}
+\newenvironment{positionhighlights}{\begin{itemize}}{\end{itemize}\smallskip}
+\newcommand{\positionsummary}[1]{{#1}\par\smallskip}
 %%% End resume preamble.

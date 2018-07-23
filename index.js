@@ -183,6 +183,65 @@ function renderWork(work) {
 }
 
 /**
+ * Render the volunteer section.
+ *
+ * @param {Array.<Position>} work The volunteer section of the resume.
+ * @returns {string} The formatted section.
+ */
+function renderVolunteer(volunteer) {
+  if (!volunteer) {
+    return '% Volunteer section omitted.';
+  }
+
+  let formattedPositions = [];
+  for (const position of volunteer) {
+    const startDate = moment(position.startDate).format('MMMM YYYY');
+    const endDate = position.endDate
+      ? moment(position.endDate).format('MMMM YYYY')
+      : 'Present';
+    let organization = position.url
+      ? `\\href{${position.url}}{${escape(position.organization)}}`
+      : escape(position.organization);
+    if (position.description) {
+      organization += ` ${escape(position.description)}`;
+    }
+    // The arguments have to be passed to the environment in a certain order:
+    // 1. Organization
+    // 2. Position
+    // 3. Date range
+    // 4. Location
+    const args = [
+      escape(organization),
+      escape(position.position),
+      `${startDate}--${endDate}`,
+      escape(position.location || ''),
+    ];
+
+    // Output the summary and highlights.
+    let positionInfo = [];
+    if (position.summary) {
+      positionInfo.push(`\\positionsummary{${escape(position.summary)}}`);
+    }
+    if (position.highlights) {
+      positionInfo.push(
+        useEnvironment(
+          'positionhighlights',
+          position.highlights
+            .map(highlight => `\\item ${escape(highlight)}`)
+            .join('\n')
+        )
+      );
+    }
+
+    formattedPositions.push(
+      useEnvironment('position', positionInfo.join('\n'), ...args)
+    );
+  }
+
+  return useEnvironment('volunteer', formattedPositions.join('\n'));
+}
+
+/**
  * The default options to use for the renderer.
  *
  * @typedef {Object} RenderOptions
@@ -191,6 +250,7 @@ function renderWork(work) {
  * @property {function(Resume): string} renderHeader The function to use for rendering the header.
  * @property {function(string): string} renderSummary The function to use for rendering the summary.
  * @property {function(Work): string} renderWork The function to use for rendering the work section.
+ * @property {function(Volunteer): string} renderVolunteer The function to use for rendering the volunteer section.
  */
 const defaultOptions = {
   documentClass: 'article',
@@ -198,6 +258,7 @@ const defaultOptions = {
   renderHeader,
   renderSummary,
   renderWork,
+  renderVolunteer,
 };
 
 /**
@@ -218,6 +279,7 @@ ${options.preamble}
 ${options.renderHeader(resume)}
 ${options.renderSummary(resume.basics.summary)}
 ${options.renderWork(resume.work)}
+${options.renderVolunteer(resume.volunteer)}
 \\end{document}
 `;
   };
