@@ -11,6 +11,12 @@ const moment = require('moment');
 const path = require('path');
 
 /**
+ * The date format to use (moment.js; see
+ * https://momentjs.com/docs/#/displaying/format/).
+ */
+const DATE_FORMAT = 'LL';
+
+/**
  * Escape any LaTeX special characters in the given string.
  *
  * @param {string} str The string to escape.
@@ -140,11 +146,10 @@ function renderWork(work) {
     return '% Work section omitted.';
   }
 
-  let formattedJobs = [];
-  for (const job of work) {
-    const startDate = moment(job.startDate).format('MMMM YYYY');
+  const formattedJobs = work.map(job => {
+    const startDate = moment(job.startDate).format(DATE_FORMAT);
     const endDate = job.endDate
-      ? moment(job.endDate).format('MMMM YYYY')
+      ? moment(job.endDate).format(DATE_FORMAT)
       : 'Present';
     let company = job.url
       ? `\\href{${job.url}}{${escape(job.company)}}`
@@ -180,8 +185,8 @@ function renderWork(work) {
       );
     }
 
-    formattedJobs.push(useEnvironment('job', jobInfo.join('\n'), ...args));
-  }
+    return useEnvironment('job', jobInfo.join('\n'), ...args);
+  });
 
   return useEnvironment('work', formattedJobs.join('\n'));
 }
@@ -197,11 +202,10 @@ function renderVolunteer(volunteer) {
     return '% Volunteer section omitted.';
   }
 
-  let formattedPositions = [];
-  for (const position of volunteer) {
-    const startDate = moment(position.startDate).format('MMMM YYYY');
+  const formattedPositions = volunteer.map(position => {
+    const startDate = moment(position.startDate).format(DATE_FORMAT);
     const endDate = position.endDate
-      ? moment(position.endDate).format('MMMM YYYY')
+      ? moment(position.endDate).format(DATE_FORMAT)
       : 'Present';
     let organization = position.url
       ? `\\href{${position.url}}{${escape(position.organization)}}`
@@ -237,10 +241,8 @@ function renderVolunteer(volunteer) {
       );
     }
 
-    formattedPositions.push(
-      useEnvironment('position', positionInfo.join('\n'), ...args)
-    );
-  }
+    return useEnvironment('position', positionInfo.join('\n'), ...args);
+  });
 
   return useEnvironment('volunteer', formattedPositions.join('\n'));
 }
@@ -256,11 +258,10 @@ function renderEducation(education) {
     return '% Education section omitted.';
   }
 
-  let formattedSchools = [];
-  for (const school of education) {
-    const startDate = moment(school.startDate).format('YYYY');
+  const formattedSchools = education.map(school => {
+    const startDate = moment(school.startDate).format(DATE_FORMAT);
     const endDate = school.endDate
-      ? moment(school.endDate).format('YYYY')
+      ? moment(school.endDate).format(DATE_FORMAT)
       : 'Present';
     const degree = `${school.studyType} (${school.area})`;
     const gpa = school.gpa ? `GPA: ${escape(school.gpa)}` : '';
@@ -283,8 +284,8 @@ function renderEducation(education) {
         )
       : '';
 
-    formattedSchools.push(useEnvironment('school', schoolInfo, ...args));
-  }
+    return useEnvironment('school', schoolInfo, ...args);
+  });
 
   return useEnvironment('education', formattedSchools.join('\n'));
 }
@@ -300,9 +301,8 @@ function renderAwards(awards) {
     return '% Awards section omitted.';
   }
 
-  let formattedAwards = [];
-  for (const award of awards) {
-    const date = moment(award.date).format('MMMM DD, YYYY');
+  const formattedAwards = awards.map(award => {
+    const date = moment(award.date).format(DATE_FORMAT);
     // Arguments to the award environment:
     // 1. Award title
     // 2. Date
@@ -312,10 +312,41 @@ function renderAwards(awards) {
     const awardInfo = award.summary
       ? `\\awardsummary{${escape(award.summary)}}`
       : '';
-    formattedAwards.push(useEnvironment('award', awardInfo, ...args));
-  }
+    return useEnvironment('award', awardInfo, ...args);
+  });
 
   return useEnvironment('awards', formattedAwards.join('\n'));
+}
+
+/**
+ * Render the publications section.
+ *
+ * @param {Array.<Publication>} publications The publications section of the resume.
+ * @returns {string} The formatted section.
+ */
+function renderPublications(publications) {
+  if (!publications) {
+    return '% Publications section omitted.';
+  }
+
+  let formattedPublications = publications.map(publication => {
+    const title = publication.url
+      ? `\\href{${publication.url}}{${escape(publication.name)}}`
+      : escape(publication.name);
+    const date = moment(publication.releaseDate).format(DATE_FORMAT);
+    // Arguments to the publication environment:
+    // 1. Title
+    // 2. Publisher
+    // 3. Date
+    const args = [title, escape(publication.publisher), date];
+    const publicationInfo = publication.summary
+      ? `\\publicationsummary{${escape(publication.summary)}}`
+      : '';
+
+    return useEnvironment('publication', publicationInfo, ...args);
+  });
+
+  return useEnvironment('publications', formattedPublications.join('\n'));
 }
 
 /**
@@ -339,7 +370,7 @@ const defaultOptions = {
   preamble: '',
   renderHeader,
   renderSummary,
-  sections: ['work', 'volunteer', 'education', 'awards'],
+  sections: ['work', 'volunteer', 'education', 'awards', 'publications'],
   sectionOptions: {
     work: {
       render: renderWork,
@@ -352,6 +383,9 @@ const defaultOptions = {
     },
     awards: {
       render: renderAwards,
+    },
+    publications: {
+      render: renderPublications,
     },
   },
 };
