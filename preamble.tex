@@ -86,9 +86,15 @@
 
 % Skills
 \newenvironment{skills}{%
-  \begingroup\let\skill\item%
   \section*{Skills}\begin{itemize}%
 }{%
-  \end{itemize}\par\pagebreak[1]\endgroup%
+  \end{itemize}\par\pagebreak[1]%
+}
+
+% Languages
+\newenvironment{languages}{%
+  \section*{Languages}\begin{itemize}%
+}{%
+  \end{itemize}\par\pagebreak[1]%
 }
 %%% End resume preamble.

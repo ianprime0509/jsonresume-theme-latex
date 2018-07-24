@@ -365,10 +365,32 @@ function renderSkills(skills) {
     if (skill.level) {
       content += ` (${skill.level})`;
     }
-    return `\\skill ${escape(content)}`;
+    return `\\item ${escape(content)}`;
   });
 
   return useEnvironment('skills', formattedSkills.join('\n'));
+}
+
+/**
+ * Render the languages section.
+ *
+ * @param {Array.<Language>} languages The languages section of the resume.
+ * @returns {string} The formatted section.
+ */
+function renderLanguages(languages) {
+  if (!languages) {
+    return '% Languages section omitted.';
+  }
+
+  const formattedLanguages = languages.map(language => {
+    let content = language.language;
+    if (language.fluency) {
+      content += ` (${language.fluency})`;
+    }
+    return `\\item ${escape(content)}`;
+  });
+
+  return useEnvironment('languages', formattedLanguages.join('\n'));
 }
 
 /**
@@ -399,6 +421,7 @@ const defaultOptions = {
     'awards',
     'publications',
     'skills',
+    'languages',
   ],
   sectionOptions: {
     work: {
@@ -418,6 +441,9 @@ const defaultOptions = {
     },
     skills: {
       render: renderSkills,
+    },
+    languages: {
+      render: renderLanguages,
     },
   },
 };
