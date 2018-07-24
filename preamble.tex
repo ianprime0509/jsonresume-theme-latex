@@ -83,4 +83,12 @@
 % 3. Date of publication
 \newenvironment{publication}[3]{\quadheader{#1}{#3}{#2}{}}{}
 \newcommand{\publicationsummary}[1]{{#1}\par\smallskip}
+
+% Skills
+\newenvironment{skills}{%
+  \begingroup\let\skill\item%
+  \section*{Skills}\begin{itemize}%
+}{%
+  \end{itemize}\par\pagebreak[1]\endgroup%
+}
 %%% End resume preamble.

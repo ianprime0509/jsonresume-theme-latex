@@ -8,3 +8,4 @@ resumes](https://jsonresume.org/).
   fields as required it's hard to tell what cases should be covered.
 - Make date formats configurable as options for the `makeTheme` function,
   since they're probably pretty common things for people to want to change.
+- Add nice PDF metadata (such as keywords from provided skill keywords).

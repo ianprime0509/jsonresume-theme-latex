@@ -350,6 +350,28 @@ function renderPublications(publications) {
 }
 
 /**
+ * Render the skills section.
+ *
+ * @param {Array.<Skill>} skills The skills section of the resume.
+ * @returns {string} The formatted section.
+ */
+function renderSkills(skills) {
+  if (!skills) {
+    return '% Skills section omitted.';
+  }
+
+  const formattedSkills = skills.map(skill => {
+    let content = skill.name;
+    if (skill.level) {
+      content += ` (${skill.level})`;
+    }
+    return `\\skill ${escape(content)}`;
+  });
+
+  return useEnvironment('skills', formattedSkills.join('\n'));
+}
+
+/**
  * The default options to use for the renderer.
  *
  * @typedef {Object} SectionOptions
@@ -370,7 +392,14 @@ const defaultOptions = {
   preamble: '',
   renderHeader,
   renderSummary,
-  sections: ['work', 'volunteer', 'education', 'awards', 'publications'],
+  sections: [
+    'work',
+    'volunteer',
+    'education',
+    'awards',
+    'publications',
+    'skills',
+  ],
   sectionOptions: {
     work: {
       render: renderWork,
@@ -386,6 +415,9 @@ const defaultOptions = {
     },
     publications: {
       render: renderPublications,
+    },
+    skills: {
+      render: renderSkills,
     },
   },
 };
