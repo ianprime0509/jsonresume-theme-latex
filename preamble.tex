@@ -104,4 +104,14 @@
 }{%
   \end{itemize}\par\pagebreak[1]%
 }
+
+% References
+\newenvironment{references}{%
+  \begingroup%
+  \newcommand{\reference}[1]{\item \textbf{##1} --- }%
+  \section*{References}\begin{itemize}%
+}{
+  \end{itemize}\par\pagebreak[1]%
+  \endgroup%
+}
 %%% End resume preamble.

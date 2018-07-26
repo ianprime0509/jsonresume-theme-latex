@@ -2,7 +2,7 @@
  * Copyright 2018 Ian Johnson
  *
  * This file is part of jsonresume-theme-latex, a free software project
- * distributed under the terms of the MIT License.  A copy of the license can be
+ * distributed under the terms of the MIT License. A copy of the license can be
  * found in the LICENSE file in the project root, or at
  * https://opensource.org/licenses/MIT.
  */
@@ -405,9 +405,27 @@ function renderInterests(interests) {
   }
 
   const formattedInterests = interests.map(
-    interest => `\\item ${interest.name}`
+    interest => `\\item ${escape(interest.name)}`
   );
   return useEnvironment('interests', formattedInterests.join('\n'));
+}
+
+/**
+ * Render the references section.
+ *
+ * @param {Array.<Reference>} references The references section of the resume.
+ * @returns {string} The formatted section.
+ */
+function renderReferences(references) {
+  if (!references) {
+    return '% References section omitted.';
+  }
+
+  const formattedReferences = references.map(
+    reference =>
+      `\\reference{${escape(reference.name)}} ${escape(reference.reference)}`
+  );
+  return useEnvironment('references', formattedReferences.join('\n'));
 }
 
 /**
@@ -440,6 +458,7 @@ const defaultOptions = {
     'skills',
     'languages',
     'interests',
+    'references',
   ],
   sectionOptions: {
     work: {
@@ -465,6 +484,9 @@ const defaultOptions = {
     },
     interests: {
       render: renderInterests,
+    },
+    references: {
+      render: renderReferences,
     },
   },
 };
