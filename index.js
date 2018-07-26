@@ -394,6 +394,23 @@ function renderLanguages(languages) {
 }
 
 /**
+ * Render the interests section.
+ *
+ * @param {Array.<Interest>} interests The interests section of the resume.
+ * @returns {string} The formatted section.
+ */
+function renderInterests(interests) {
+  if (!interests) {
+    return '% Interests section omitted.';
+  }
+
+  const formattedInterests = interests.map(
+    interest => `\\item ${interest.name}`
+  );
+  return useEnvironment('interests', formattedInterests.join('\n'));
+}
+
+/**
  * The default options to use for the renderer.
  *
  * @typedef {Object} SectionOptions
@@ -422,6 +439,7 @@ const defaultOptions = {
     'publications',
     'skills',
     'languages',
+    'interests',
   ],
   sectionOptions: {
     work: {
@@ -444,6 +462,9 @@ const defaultOptions = {
     },
     languages: {
       render: renderLanguages,
+    },
+    interests: {
+      render: renderInterests,
     },
   },
 };
