@@ -1,10 +1,8 @@
-/*
- * Copyright 2018 Ian Johnson
- *
- * This file is part of jsonresume-theme-latex, a free software project
- * distributed under the terms of the MIT License. A copy of the license can be
- * found in the LICENSE file in the project root, or at
- * https://opensource.org/licenses/MIT.
+/**
+ * @file The contents of the module.
+ * @author Ian Johnson
+ * @copyright 2018 Ian Johnson
+ * @license MIT
  */
 import moment from 'moment';
 
@@ -20,7 +18,7 @@ const DATE_FORMAT = 'LL';
  * @param str the string to escape
  * @returns the escaped string
  */
-function escape(str: string): string {
+export function escape(str: string): string {
   if (!str) {
     return '';
   }
@@ -41,7 +39,7 @@ function escape(str: string): string {
  * @param code the code to indent
  * @returns the indented code
  */
-function indent(code: string): string {
+export function indent(code: string): string {
   return code
     .split('\n')
     .map(str => (str === '' ? '' : '  ' + str))
@@ -56,7 +54,11 @@ function indent(code: string): string {
  * @param args any arguments to pass to the environment
  * @returns the code within the environment
  */
-function useEnvironment(env: string, code: string, ...args: string[]): string {
+export function useEnvironment(
+  env: string,
+  code: string,
+  ...args: string[]
+): string {
   return `\\begin{${env}}${args.map(arg => `{${arg}}`).join('')}
 ${indent(code)}
 \\end{${env}}`;
@@ -70,7 +72,7 @@ ${indent(code)}
  * @param phone the raw phone number (no punctuation except country code, e.g. 5555555555 or +15555555555) to format
  * @returns the formatted phone number
  */
-function formatPhone(phone: string): string {
+export function formatPhone(phone: string): string {
   let country = '';
   if (phone[0] === '+' || phone.length > 10) {
     // Country code included.
@@ -91,7 +93,7 @@ function formatPhone(phone: string): string {
  * @param resume the resume data
  * @returns the rendered header
  */
-function renderHeader(resume: any): string {
+export function renderHeader(resume: any): string {
   const { name, label, email, phone, website, location } = resume.basics;
 
   const contents = [`\\name{${escape(name)}}`];
@@ -126,7 +128,7 @@ function renderHeader(resume: any): string {
  * @param summary the summary to render
  * @returns the rendered summary
  */
-function renderSummary(summary: string): string {
+export function renderSummary(summary: string): string {
   return summary
     ? `\\summary{${escape(summary)}}`
     : '% Summary section omitted.';
@@ -138,7 +140,7 @@ function renderSummary(summary: string): string {
  * @param work the work section of the resume
  * @returns the formatted section
  */
-function renderWork(work?: any[]): string {
+export function renderWork(work?: any[]): string {
   if (!work) {
     return '% Work section omitted.';
   }
@@ -194,7 +196,7 @@ function renderWork(work?: any[]): string {
  * @param work the volunteer section of the resume
  * @returns the formatted section
  */
-function renderVolunteer(volunteer?: any[]): string {
+export function renderVolunteer(volunteer?: any[]): string {
   if (!volunteer) {
     return '% Volunteer section omitted.';
   }
@@ -250,7 +252,7 @@ function renderVolunteer(volunteer?: any[]): string {
  * @param education the education section of the resume
  * @returns the formatted section
  */
-function renderEducation(education?: any[]): string {
+export function renderEducation(education?: any[]): string {
   if (!education) {
     return '% Education section omitted.';
   }
@@ -295,7 +297,7 @@ function renderEducation(education?: any[]): string {
  * @param awards the awards section of the resume
  * @returns the formatted section
  */
-function renderAwards(awards?: any[]): string {
+export function renderAwards(awards?: any[]): string {
   if (!awards) {
     return '% Awards section omitted.';
   }
@@ -323,7 +325,7 @@ function renderAwards(awards?: any[]): string {
  * @param publications the publications section of the resume
  * @returns the formatted section
  */
-function renderPublications(publications?: any[]): string {
+export function renderPublications(publications?: any[]): string {
   if (!publications) {
     return '% Publications section omitted.';
   }
@@ -354,7 +356,7 @@ function renderPublications(publications?: any[]): string {
  * @param skills the skills section of the resume
  * @returns the formatted section
  */
-function renderSkills(skills?: any[]): string {
+export function renderSkills(skills?: any[]): string {
   if (!skills) {
     return '% Skills section omitted.';
   }
@@ -376,7 +378,7 @@ function renderSkills(skills?: any[]): string {
  * @param languages the languages section of the resume
  * @returns the formatted section
  */
-function renderLanguages(languages?: any[]): string {
+export function renderLanguages(languages?: any[]): string {
   if (!languages) {
     return '% Languages section omitted.';
   }
@@ -398,7 +400,7 @@ function renderLanguages(languages?: any[]): string {
  * @param interests the interests section of the resume
  * @returns the formatted section
  */
-function renderInterests(interests?: any[]): string {
+export function renderInterests(interests?: any[]): string {
   if (!interests) {
     return '% Interests section omitted.';
   }
@@ -415,7 +417,7 @@ function renderInterests(interests?: any[]): string {
  * @param references the references section of the resume
  * @returns the formatted section
  */
-function renderReferences(references?: any[]): string {
+export function renderReferences(references?: any[]): string {
   if (!references) {
     return '% References section omitted.';
   }
@@ -433,7 +435,7 @@ function renderReferences(references?: any[]): string {
  * @param projects the projects section of the resume
  * @returns the formatted section
  */
-function renderProjects(projects?: any[]): string {
+export function renderProjects(projects?: any[]): string {
   if (!projects) {
     return '% Projects section omitted.';
   }
@@ -527,7 +529,7 @@ export interface RenderOptions {
 /**
  * The default options to use for the renderer.
  */
-const defaultOptions: RenderOptions = {
+export const defaultOptions: RenderOptions = {
   documentClass: 'article',
   preamble: '',
   renderHeader,
@@ -578,7 +580,7 @@ const defaultOptions: RenderOptions = {
   ],
 };
 
-type RenderFunction = (resume: any) => string;
+export type RenderFunction = (resume: any) => string;
 
 /**
  * Returns a render function that renders resume data in LaTeX format.

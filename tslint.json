@@ -5,6 +5,7 @@
   "rules": {
     "arrow-parens": false,
     "interface-name": false,
+    "trailing-comma": false,
     "no-conditional-assignment": false,
     "quotemark": [true, "single", "avoid-escape"],
     "variable-name": [
