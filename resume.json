@@ -114,5 +114,20 @@
       "reference":
         "It is my pleasure to recommend Richard, his performance working as a consultant for Main St. Company proved that he will be a valuable addition to any company."
     }
+  ],
+  "projects": [
+    {
+      "name": "Temperatune",
+      "description": "Simple web-based tuner application for musicians.",
+      "highlights": [
+        "Engage users with attractive and intuitive interface.",
+        "Provide robust support for musical temperaments."
+      ],
+      "startDate": "2018-02-04",
+      "endDate": "2018-06-22",
+      "url": "https://ianprime0509.github.io/temperatune",
+      "roles": ["Sole developer"],
+      "type": "web application"
+    }
   ]
 }

@@ -94,10 +94,9 @@ function formatPhone(phone) {
  * @returns {string} The rendered header.
  */
 function renderHeader(resume) {
-  const basics = resume.basics;
   const { name, label, email, phone, website, location } = resume.basics;
 
-  let contents = [`\\name{${escape(name)}}`];
+  const contents = [`\\name{${escape(name)}}`];
   if (label) {
     contents.push(`\\personallabel{${escape(label)}}`);
   }
@@ -151,7 +150,7 @@ function renderWork(work) {
     const endDate = job.endDate
       ? moment(job.endDate).format(DATE_FORMAT)
       : 'Present';
-    let company = job.url
+    const company = job.url
       ? `\\href{${job.url}}{${escape(job.company)}}`
       : escape(job.company);
     if (job.description) {
@@ -170,7 +169,7 @@ function renderWork(work) {
     ];
 
     // Output the summary and highlights.
-    let jobInfo = [];
+    const jobInfo = [];
     if (job.summary) {
       jobInfo.push(`\\jobsummary{${escape(job.summary)}}`);
     }
@@ -226,7 +225,7 @@ function renderVolunteer(volunteer) {
     ];
 
     // Output the summary and highlights.
-    let positionInfo = [];
+    const positionInfo = [];
     if (position.summary) {
       positionInfo.push(`\\positionsummary{${escape(position.summary)}}`);
     }
@@ -329,7 +328,7 @@ function renderPublications(publications) {
     return '% Publications section omitted.';
   }
 
-  let formattedPublications = publications.map(publication => {
+  const formattedPublications = publications.map(publication => {
     const title = publication.url
       ? `\\href{${publication.url}}{${escape(publication.name)}}`
       : escape(publication.name);
@@ -429,6 +428,57 @@ function renderReferences(references) {
 }
 
 /**
+ * Render the projects section.
+ *
+ * @param {Array.<Project>} projects The projects section of the resume.
+ * @returns {string} The formatted section.
+ */
+function renderProjects(projects) {
+  if (!projects) {
+    return '% Projects section omitted.';
+  }
+  const formattedProjects = projects.map(project => {
+    const name = project.url
+      ? `\\href{${project.url}}{${escape(project.name)}}`
+      : escape(project.name);
+    const roles = project.roles ? project.roles.join(', ') : '';
+    const startDate = moment(project.startDate).format(DATE_FORMAT);
+    const endDate = project.endDate
+      ? moment(project.endDate).format(DATE_FORMAT)
+      : 'Present';
+    // Arguments to the project environment:
+    // 1. Name
+    // 2. Role
+    // 3. Date range
+    // 4. Company
+    const args = [
+      name,
+      escape(roles),
+      `${startDate}--${endDate}`,
+      escape(project.entity),
+    ];
+
+    const projectInfo = [];
+    if (project.description) {
+      projectInfo.push(`\\projectsummary{${escape(project.description)}}`);
+    }
+    if (project.highlights) {
+      projectInfo.push(
+        useEnvironment(
+          'projecthighlights',
+          project.highlights
+            .map(highlight => `\\item ${escape(highlight)}`)
+            .join('\n')
+        )
+      );
+    }
+
+    return useEnvironment('project', projectInfo.join('\n'), ...args);
+  });
+  return useEnvironment('projects', formattedProjects.join('\n'));
+}
+
+/**
  * The default options to use for the renderer.
  *
  * @typedef {Object} SectionOptions
@@ -459,6 +509,7 @@ const defaultOptions = {
     'languages',
     'interests',
     'references',
+    'projects',
   ],
   sectionOptions: {
     work: {
@@ -487,6 +538,9 @@ const defaultOptions = {
     },
     references: {
       render: renderReferences,
+    },
+    projects: {
+      render: renderProjects,
     },
   },
 };
