@@ -6,9 +6,7 @@
  * found in the LICENSE file in the project root, or at
  * https://opensource.org/licenses/MIT.
  */
-const fs = require('fs');
-const moment = require('moment');
-const path = require('path');
+import moment from 'moment';
 
 /**
  * The date format to use (moment.js; see
@@ -17,18 +15,18 @@ const path = require('path');
 const DATE_FORMAT = 'LL';
 
 /**
- * Escape any LaTeX special characters in the given string.
+ * Escapes any LaTeX special characters in the given string.
  *
- * @param {string} str The string to escape.
- * @returns {string} The escaped string.
+ * @param str the string to escape
+ * @returns the escaped string
  */
-function escape(str) {
+function escape(str: string): string {
   if (!str) {
     return '';
   }
   // Uses the approach described in https://stackoverflow.com/a/15604206.
   // TODO: complete the implementation by filling in more escapes.
-  const escapes = {
+  const escapes: { [key: string]: string } = {
     '\n': ' \\\\ ',
     ' - ': ' --- ',
   };
@@ -38,12 +36,12 @@ function escape(str) {
 }
 
 /**
- * Indent the given code by one level.
+ * Indents the given code by one level.
  *
- * @param {string} code The code to indent.
- * @returns {string} The indented code.
+ * @param code the code to indent
+ * @returns the indented code
  */
-function indent(code) {
+function indent(code: string): string {
   return code
     .split('\n')
     .map(str => (str === '' ? '' : '  ' + str))
@@ -51,28 +49,28 @@ function indent(code) {
 }
 
 /**
- * Enclose the given LaTeX code inside the given environment.
+ * Encloses the given LaTeX code inside the given environment.
  *
- * @param {string} env The environment to use.
- * @param {string} code The code to enclose.
- * @param {...string} args Any arguments to pass to the environment.
- * @returns {string} The code within the environment.
+ * @param env the environment to use
+ * @param code the code to enclose
+ * @param args any arguments to pass to the environment
+ * @returns the code within the environment
  */
-function useEnvironment(env, code, ...args) {
+function useEnvironment(env: string, code: string, ...args: string[]): string {
   return `\\begin{${env}}${args.map(arg => `{${arg}}`).join('')}
 ${indent(code)}
 \\end{${env}}`;
 }
 
 /**
- * Format the given (raw) phone number into a pretty LaTeX form.
+ * Formats the given (raw) phone number into a pretty LaTeX form.
  *
  * TODO: make this function a bit more robust and document what it does better.
  *
- * @param {string} phone The raw phone number (no punctuation except country code, e.g. 5555555555 or +15555555555) to format.
- * @returns {string} The formatted phone number.
+ * @param phone the raw phone number (no punctuation except country code, e.g. 5555555555 or +15555555555) to format
+ * @returns the formatted phone number
  */
-function formatPhone(phone) {
+function formatPhone(phone: string): string {
   let country = '';
   if (phone[0] === '+' || phone.length > 10) {
     // Country code included.
@@ -81,19 +79,19 @@ function formatPhone(phone) {
   }
   const formatted = `(${phone.slice(0, 3)}) ${phone.slice(3, 6)}--${phone.slice(
     6,
-    10
+    10,
   )}`;
 
   return country ? `${country} ${formatted}` : formatted;
 }
 
 /**
- * Render the resume header.
+ * Renders the resume header.
  *
- * @param {Resume} resume The resume data.
- * @returns {string} The rendered header.
+ * @param resume the resume data
+ * @returns the rendered header
  */
-function renderHeader(resume) {
+function renderHeader(resume: any): string {
   const { name, label, email, phone, website, location } = resume.basics;
 
   const contents = [`\\name{${escape(name)}}`];
@@ -103,8 +101,8 @@ function renderHeader(resume) {
   if (location) {
     contents.push(
       `\\location{${escape(location.address)} \\\\ ${escape(
-        location.city
-      )}, ${escape(location.postalCode)}}`
+        location.city,
+      )}, ${escape(location.postalCode)}}`,
     );
   }
   if (email) {
@@ -123,24 +121,24 @@ function renderHeader(resume) {
 }
 
 /**
- * Render the resume summary.
+ * Renders the resume summary.
  *
- * @param {string} summary The summary to render.
- * @returns {string} The rendered summary.
+ * @param summary the summary to render
+ * @returns the rendered summary
  */
-function renderSummary(summary) {
+function renderSummary(summary: string): string {
   return summary
     ? `\\summary{${escape(summary)}}`
     : '% Summary section omitted.';
 }
 
 /**
- * Render the work section.
+ * Renders the work section.
  *
- * @param {Array.<Job>} work The work section of the resume.
- * @returns {string} The formatted section.
+ * @param work the work section of the resume
+ * @returns the formatted section
  */
-function renderWork(work) {
+function renderWork(work?: any[]): string {
   if (!work) {
     return '% Work section omitted.';
   }
@@ -150,7 +148,7 @@ function renderWork(work) {
     const endDate = job.endDate
       ? moment(job.endDate).format(DATE_FORMAT)
       : 'Present';
-    const company = job.url
+    let company = job.url
       ? `\\href{${job.url}}{${escape(job.company)}}`
       : escape(job.company);
     if (job.description) {
@@ -177,10 +175,10 @@ function renderWork(work) {
       jobInfo.push(
         useEnvironment(
           'jobhighlights',
-          job.highlights
+          (job.highlights as string[])
             .map(highlight => `\\item ${escape(highlight)}`)
-            .join('\n')
-        )
+            .join('\n'),
+        ),
       );
     }
 
@@ -191,12 +189,12 @@ function renderWork(work) {
 }
 
 /**
- * Render the volunteer section.
+ * Renders the volunteer section.
  *
- * @param {Array.<Position>} work The volunteer section of the resume.
- * @returns {string} The formatted section.
+ * @param work the volunteer section of the resume
+ * @returns the formatted section
  */
-function renderVolunteer(volunteer) {
+function renderVolunteer(volunteer?: any[]): string {
   if (!volunteer) {
     return '% Volunteer section omitted.';
   }
@@ -233,10 +231,10 @@ function renderVolunteer(volunteer) {
       positionInfo.push(
         useEnvironment(
           'positionhighlights',
-          position.highlights
+          (position.highlights as string[])
             .map(highlight => `\\item ${escape(highlight)}`)
-            .join('\n')
-        )
+            .join('\n'),
+        ),
       );
     }
 
@@ -247,12 +245,12 @@ function renderVolunteer(volunteer) {
 }
 
 /**
- * Render the education section.
+ * Renders the education section.
  *
- * @param {Array.<School>} education The education section of the resume.
- * @returns {string} The formatted section.
+ * @param education the education section of the resume
+ * @returns the formatted section
  */
-function renderEducation(education) {
+function renderEducation(education?: any[]): string {
   if (!education) {
     return '% Education section omitted.';
   }
@@ -279,7 +277,9 @@ function renderEducation(education) {
     const schoolInfo = school.courses
       ? useEnvironment(
           'courses',
-          school.courses.map(course => `\\item ${escape(course)}`).join('\n')
+          (school.courses as string[])
+            .map(course => `\\item ${escape(course)}`)
+            .join('\n'),
         )
       : '';
 
@@ -290,12 +290,12 @@ function renderEducation(education) {
 }
 
 /**
- * Render the awards section.
+ * Renders the awards section.
  *
- * @param {Array.<Award>} awards The awards section of the resume.
- * @returns {string} The formatted section.
+ * @param awards the awards section of the resume
+ * @returns the formatted section
  */
-function renderAwards(awards) {
+function renderAwards(awards?: any[]): string {
   if (!awards) {
     return '% Awards section omitted.';
   }
@@ -318,12 +318,12 @@ function renderAwards(awards) {
 }
 
 /**
- * Render the publications section.
+ * Renders the publications section.
  *
- * @param {Array.<Publication>} publications The publications section of the resume.
- * @returns {string} The formatted section.
+ * @param publications the publications section of the resume
+ * @returns the formatted section
  */
-function renderPublications(publications) {
+function renderPublications(publications?: any[]): string {
   if (!publications) {
     return '% Publications section omitted.';
   }
@@ -349,12 +349,12 @@ function renderPublications(publications) {
 }
 
 /**
- * Render the skills section.
+ * Renders the skills section.
  *
- * @param {Array.<Skill>} skills The skills section of the resume.
- * @returns {string} The formatted section.
+ * @param skills the skills section of the resume
+ * @returns the formatted section
  */
-function renderSkills(skills) {
+function renderSkills(skills?: any[]): string {
   if (!skills) {
     return '% Skills section omitted.';
   }
@@ -371,12 +371,12 @@ function renderSkills(skills) {
 }
 
 /**
- * Render the languages section.
+ * Renders the languages section.
  *
- * @param {Array.<Language>} languages The languages section of the resume.
- * @returns {string} The formatted section.
+ * @param languages the languages section of the resume
+ * @returns the formatted section
  */
-function renderLanguages(languages) {
+function renderLanguages(languages?: any[]): string {
   if (!languages) {
     return '% Languages section omitted.';
   }
@@ -393,47 +393,47 @@ function renderLanguages(languages) {
 }
 
 /**
- * Render the interests section.
+ * Renders the interests section.
  *
- * @param {Array.<Interest>} interests The interests section of the resume.
- * @returns {string} The formatted section.
+ * @param interests the interests section of the resume
+ * @returns the formatted section
  */
-function renderInterests(interests) {
+function renderInterests(interests?: any[]): string {
   if (!interests) {
     return '% Interests section omitted.';
   }
 
   const formattedInterests = interests.map(
-    interest => `\\item ${escape(interest.name)}`
+    interest => `\\item ${escape(interest.name)}`,
   );
   return useEnvironment('interests', formattedInterests.join('\n'));
 }
 
 /**
- * Render the references section.
+ * Renders the references section.
  *
- * @param {Array.<Reference>} references The references section of the resume.
- * @returns {string} The formatted section.
+ * @param references the references section of the resume
+ * @returns the formatted section
  */
-function renderReferences(references) {
+function renderReferences(references?: any[]): string {
   if (!references) {
     return '% References section omitted.';
   }
 
   const formattedReferences = references.map(
     reference =>
-      `\\reference{${escape(reference.name)}} ${escape(reference.reference)}`
+      `\\reference{${escape(reference.name)}} ${escape(reference.reference)}`,
   );
   return useEnvironment('references', formattedReferences.join('\n'));
 }
 
 /**
- * Render the projects section.
+ * Renders the projects section.
  *
- * @param {Array.<Project>} projects The projects section of the resume.
- * @returns {string} The formatted section.
+ * @param projects the projects section of the resume
+ * @returns the formatted section
  */
-function renderProjects(projects) {
+function renderProjects(projects?: any[]): string {
   if (!projects) {
     return '% Projects section omitted.';
   }
@@ -466,10 +466,10 @@ function renderProjects(projects) {
       projectInfo.push(
         useEnvironment(
           'projecthighlights',
-          project.highlights
+          (project.highlights as string[])
             .map(highlight => `\\item ${escape(highlight)}`)
-            .join('\n')
-        )
+            .join('\n'),
+        ),
       );
     }
 
@@ -479,26 +479,91 @@ function renderProjects(projects) {
 }
 
 /**
- * The default options to use for the renderer.
- *
- * @typedef {Object} SectionOptions
- * @property {function(Object): string} render The function to use to render this section.
- *
- * @typedef {Object} RenderOptions
- * @property {string} documentClass The documentclass to use for the output.
- * @property {string} preamble The preamble to use in the output.
- * @property {function(Resume): string} renderHeader The function to use for rendering the header.
- * @property {function(string): string} renderSummary The function to use for rendering the summary.
- * @property {Array.<string>} sections The sections to output, in the order they should appear.
- * @property {Object.<string, SectionOptions>} sectionOptions Options for each section.
- *
- * @type {RenderOptions}
+ * Options for rendering a single section of the resume.
  */
-const defaultOptions = {
+export interface SectionOptions<T> {
+  /**
+   * The function to use to render this section.
+   *
+   * @param sectionData the data of the section to render
+   */
+  render(sectionData: T): string;
+}
+
+/**
+ * Global options for rendering a resume.
+ */
+export interface RenderOptions {
+  /**
+   * The documentclass to use for the output.
+   */
+  documentClass: string;
+  /**
+   * The preamble to use in the output.
+   */
+  preamble: string;
+  /**
+   * The sections to output, in the order they should appear.
+   */
+  sections: string[];
+  /**
+   * The options for each section.
+   */
+  sectionOptions: { [key: string]: SectionOptions<any> };
+  /**
+   * The function to use for rendering the header.
+   *
+   * @param resume the resume data
+   */
+  renderHeader(resume: any): string;
+  /**
+   * The function to use for rendering the resume summary.
+   *
+   * @param summary the summary string
+   */
+  renderSummary(summary: string): string;
+}
+
+/**
+ * The default options to use for the renderer.
+ */
+const defaultOptions: RenderOptions = {
   documentClass: 'article',
   preamble: '',
   renderHeader,
   renderSummary,
+  sectionOptions: {
+    awards: {
+      render: renderAwards,
+    },
+    education: {
+      render: renderEducation,
+    },
+    interests: {
+      render: renderInterests,
+    },
+    languages: {
+      render: renderLanguages,
+    },
+    projects: {
+      render: renderProjects,
+    },
+    publications: {
+      render: renderPublications,
+    },
+    references: {
+      render: renderReferences,
+    },
+    skills: {
+      render: renderSkills,
+    },
+    volunteer: {
+      render: renderVolunteer,
+    },
+    work: {
+      render: renderWork,
+    },
+  },
   sections: [
     'work',
     'volunteer',
@@ -511,72 +576,35 @@ const defaultOptions = {
     'references',
     'projects',
   ],
-  sectionOptions: {
-    work: {
-      render: renderWork,
-    },
-    volunteer: {
-      render: renderVolunteer,
-    },
-    education: {
-      render: renderEducation,
-    },
-    awards: {
-      render: renderAwards,
-    },
-    publications: {
-      render: renderPublications,
-    },
-    skills: {
-      render: renderSkills,
-    },
-    languages: {
-      render: renderLanguages,
-    },
-    interests: {
-      render: renderInterests,
-    },
-    references: {
-      render: renderReferences,
-    },
-    projects: {
-      render: renderProjects,
-    },
-  },
 };
 
+type RenderFunction = (resume: any) => string;
+
 /**
- * Return a render function that renders resume data in LaTeX format.
+ * Returns a render function that renders resume data in LaTeX format.
  *
- * @param {RenderOptions} [options] The options to use for the renderer.
+ * @param options the options to use for the renderer
  *
- * @returns {function} The render function.
+ * @returns the render function
  */
-function makeTheme(options = defaultOptions) {
+export function makeTheme(
+  options: Partial<RenderOptions> = defaultOptions,
+): RenderFunction {
   // Provide values for unspecified options.
-  options = Object.assign(defaultOptions, options);
+  const allOptions: RenderOptions = Object.assign(defaultOptions, options);
 
   return resume => {
-    return `\\documentclass{${options.documentClass}}
-${options.preamble}
+    return `\\documentclass{${allOptions.documentClass}}
+${allOptions.preamble}
 \\begin{document}
-${options.renderHeader(resume)}
-${options.renderSummary(resume.basics.summary)}
-${options.sections
-      .map(section => options.sectionOptions[section].render(resume[section]))
+${allOptions.renderHeader(resume)}
+${allOptions.renderSummary(resume.basics.summary)}
+${allOptions.sections
+      .map(section =>
+        allOptions.sectionOptions[section].render(resume[section]),
+      )
       .join('\n')}
 \\end{document}
 `;
   };
 }
-
-const preamble = fs.readFileSync(path.join(__dirname, 'preamble.tex'));
-const render = makeTheme({ preamble });
-
-module.exports = {
-  makeTheme,
-  render,
-};
-
-const resume = JSON.parse(fs.readFileSync(path.join(__dirname, 'resume.json')));
-console.log(render(resume));
