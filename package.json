@@ -15,6 +15,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^10.11.1",
+    "@ianprime0509/jsonresume-schema": "^0.0.1",
     "prettier": "^1.14.3",
     "tslint": "^5.11.0",
     "typescript": "^3.1.1"

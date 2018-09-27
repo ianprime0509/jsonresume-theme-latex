@@ -8,6 +8,20 @@ import * as fs from 'fs';
 import moment from 'moment';
 import * as path from 'path';
 
+import {
+  Awards,
+  Education,
+  Interests,
+  JSONResume as Resume,
+  Languages,
+  Projects,
+  Publications,
+  References,
+  Skills,
+  Volunteer,
+  Work,
+} from '@ianprime0509/jsonresume-schema';
+
 /**
  * The date format to use (moment.js; see
  * https://momentjs.com/docs/#/displaying/format/).
@@ -95,14 +109,17 @@ export function formatPhone(phone: string): string {
  * @param resume the resume data
  * @returns the rendered header
  */
-export function renderHeader(resume: any): string {
+export function renderHeader(resume: Resume): string {
+  if (!resume.basics) {
+    return '% No header information found.';
+  }
   const { name, label, email, phone, website, location } = resume.basics;
 
-  const contents = [`\\name{${escape(name)}}`];
+  const contents = name ? [`\\name{${escape(name)}}`] : [];
   if (label) {
     contents.push(`\\personallabel{${escape(label)}}`);
   }
-  if (location) {
+  if (location && location.address && location.city && location.postalCode) {
     contents.push(
       `\\location{${escape(location.address)} \\\\ ${escape(
         location.city,
@@ -142,7 +159,7 @@ export function renderSummary(summary: string): string {
  * @param work the work section of the resume
  * @returns the formatted section
  */
-export function renderWork(work?: any[]): string {
+export function renderWork(work?: Work): string {
   if (!work) {
     return '% Work section omitted.';
   }
@@ -153,8 +170,8 @@ export function renderWork(work?: any[]): string {
       ? moment(job.endDate).format(DATE_FORMAT)
       : 'Present';
     let company = job.url
-      ? `\\href{${job.url}}{${escape(job.company)}}`
-      : escape(job.company);
+      ? `\\href{${job.url}}{${escape(job.name || 'Untitled')}}`
+      : escape(job.name || 'Untitled');
     if (job.description) {
       company += ` ${escape(job.description)}`;
     }
@@ -165,9 +182,9 @@ export function renderWork(work?: any[]): string {
     // 4. Location
     const args = [
       escape(company),
-      escape(job.position),
+      escape(job.position || ''),
       `${startDate}--${endDate}`,
-      escape(job.location),
+      escape(job.location || ''),
     ];
 
     // Output the summary and highlights.
@@ -198,7 +215,7 @@ export function renderWork(work?: any[]): string {
  * @param work the volunteer section of the resume
  * @returns the formatted section
  */
-export function renderVolunteer(volunteer?: any[]): string {
+export function renderVolunteer(volunteer?: Volunteer): string {
   if (!volunteer) {
     return '% Volunteer section omitted.';
   }
@@ -209,8 +226,10 @@ export function renderVolunteer(volunteer?: any[]): string {
       ? moment(position.endDate).format(DATE_FORMAT)
       : 'Present';
     let organization = position.url
-      ? `\\href{${position.url}}{${escape(position.organization)}}`
-      : escape(position.organization);
+      ? `\\href{${position.url}}{${escape(
+          position.organization || 'Undisclosed',
+        )}}`
+      : escape(position.organization || 'Undisclosed');
     if (position.description) {
       organization += ` ${escape(position.description)}`;
     }
@@ -221,7 +240,7 @@ export function renderVolunteer(volunteer?: any[]): string {
     // 4. Location
     const args = [
       escape(organization),
-      escape(position.position),
+      escape(position.position || ''),
       `${startDate}--${endDate}`,
       escape(position.location),
     ];
@@ -254,7 +273,7 @@ export function renderVolunteer(volunteer?: any[]): string {
  * @param education the education section of the resume
  * @returns the formatted section
  */
-export function renderEducation(education?: any[]): string {
+export function renderEducation(education?: Education): string {
   if (!education) {
     return '% Education section omitted.';
   }
@@ -272,7 +291,7 @@ export function renderEducation(education?: any[]): string {
     // 3. Date range
     // 4. GPA
     const args = [
-      escape(school.institution),
+      escape(school.institution || ''),
       escape(degree),
       `${startDate}--${endDate}`,
       escape(gpa),
@@ -281,9 +300,7 @@ export function renderEducation(education?: any[]): string {
     const schoolInfo = school.courses
       ? useEnvironment(
           'courses',
-          (school.courses as string[])
-            .map(course => `\\item ${escape(course)}`)
-            .join('\n'),
+          school.courses.map(course => `\\item ${escape(course)}`).join('\n'),
         )
       : '';
 
@@ -299,7 +316,7 @@ export function renderEducation(education?: any[]): string {
  * @param awards the awards section of the resume
  * @returns the formatted section
  */
-export function renderAwards(awards?: any[]): string {
+export function renderAwards(awards?: Awards): string {
   if (!awards) {
     return '% Awards section omitted.';
   }
@@ -310,7 +327,7 @@ export function renderAwards(awards?: any[]): string {
     // 1. Award title
     // 2. Date
     // 3. Awarder
-    const args = [escape(award.title), date, escape(award.awarder)];
+    const args = [escape(award.title || ''), date, escape(award.awarder || '')];
 
     const awardInfo = award.summary
       ? `\\awardsummary{${escape(award.summary)}}`
@@ -327,21 +344,21 @@ export function renderAwards(awards?: any[]): string {
  * @param publications the publications section of the resume
  * @returns the formatted section
  */
-export function renderPublications(publications?: any[]): string {
+export function renderPublications(publications?: Publications): string {
   if (!publications) {
     return '% Publications section omitted.';
   }
 
   const formattedPublications = publications.map(publication => {
     const title = publication.url
-      ? `\\href{${publication.url}}{${escape(publication.name)}}`
-      : escape(publication.name);
+      ? `\\href{${publication.url}}{${escape(publication.name || 'Untitled')}}`
+      : escape(publication.name || 'Untitled');
     const date = moment(publication.releaseDate).format(DATE_FORMAT);
     // Arguments to the publication environment:
     // 1. Title
     // 2. Publisher
     // 3. Date
-    const args = [title, escape(publication.publisher), date];
+    const args = [title, escape(publication.publisher || ''), date];
     const publicationInfo = publication.summary
       ? `\\publicationsummary{${escape(publication.summary)}}`
       : '';
@@ -358,7 +375,7 @@ export function renderPublications(publications?: any[]): string {
  * @param skills the skills section of the resume
  * @returns the formatted section
  */
-export function renderSkills(skills?: any[]): string {
+export function renderSkills(skills?: Skills): string {
   if (!skills) {
     return '% Skills section omitted.';
   }
@@ -380,7 +397,7 @@ export function renderSkills(skills?: any[]): string {
  * @param languages the languages section of the resume
  * @returns the formatted section
  */
-export function renderLanguages(languages?: any[]): string {
+export function renderLanguages(languages?: Languages): string {
   if (!languages) {
     return '% Languages section omitted.';
   }
@@ -402,7 +419,7 @@ export function renderLanguages(languages?: any[]): string {
  * @param interests the interests section of the resume
  * @returns the formatted section
  */
-export function renderInterests(interests?: any[]): string {
+export function renderInterests(interests?: Interests): string {
   if (!interests) {
     return '% Interests section omitted.';
   }
@@ -419,14 +436,16 @@ export function renderInterests(interests?: any[]): string {
  * @param references the references section of the resume
  * @returns the formatted section
  */
-export function renderReferences(references?: any[]): string {
+export function renderReferences(references?: References): string {
   if (!references) {
     return '% References section omitted.';
   }
 
   const formattedReferences = references.map(
     reference =>
-      `\\reference{${escape(reference.name)}} ${escape(reference.reference)}`,
+      `\\reference{${escape(reference.name || 'Undisclosed name')}} ${escape(
+        reference.reference || '',
+      )}`,
   );
   return useEnvironment('references', formattedReferences.join('\n'));
 }
@@ -437,14 +456,14 @@ export function renderReferences(references?: any[]): string {
  * @param projects the projects section of the resume
  * @returns the formatted section
  */
-export function renderProjects(projects?: any[]): string {
+export function renderProjects(projects?: Projects): string {
   if (!projects) {
     return '% Projects section omitted.';
   }
   const formattedProjects = projects.map(project => {
     const name = project.url
-      ? `\\href{${project.url}}{${escape(project.name)}}`
-      : escape(project.name);
+      ? `\\href{${project.url}}{${escape(project.name || 'Untitled')}}`
+      : escape(project.name || 'Untitled');
     const roles = project.roles ? project.roles.join(', ') : '';
     const startDate = moment(project.startDate).format(DATE_FORMAT);
     const endDate = project.endDate
@@ -459,7 +478,7 @@ export function renderProjects(projects?: any[]): string {
       name,
       escape(roles),
       `${startDate}--${endDate}`,
-      escape(project.entity),
+      escape(project.entity || ''),
     ];
 
     const projectInfo = [];
@@ -501,11 +520,11 @@ export interface RenderOptions {
   /**
    * The documentclass to use for the output.
    */
-  documentClass?: string;
+  documentClass: string;
   /**
    * The preamble to use in the output.
    */
-  preamble?: string;
+  preamble: string;
   /**
    * The sections to output, in the order they should appear.
    */
@@ -513,13 +532,25 @@ export interface RenderOptions {
   /**
    * The options for each section.
    */
-  sectionOptions: { [key: string]: SectionOptions<any> };
+  sectionOptions: {
+    awards?: SectionOptions<Awards>;
+    education?: SectionOptions<Education>;
+    interests?: SectionOptions<Interests>;
+    languages?: SectionOptions<Languages>;
+    projects?: SectionOptions<Projects>;
+    publications?: SectionOptions<Publications>;
+    references?: SectionOptions<References>;
+    skills?: SectionOptions<Skills>;
+    volunteer?: SectionOptions<Volunteer>;
+    work?: SectionOptions<Work>;
+    [section: string]: SectionOptions<any> | undefined;
+  };
   /**
    * The function to use for rendering the header.
    *
    * @param resume the resume data
    */
-  renderHeader(resume: any): string;
+  renderHeader(resume: Resume): string;
   /**
    * The function to use for rendering the resume summary.
    *
@@ -533,6 +564,7 @@ export interface RenderOptions {
  */
 export const defaultOptions: Readonly<RenderOptions> = Object.freeze({
   documentClass: 'article',
+  preamble: '',
   renderHeader,
   renderSummary,
   sectionOptions: {
@@ -601,15 +633,16 @@ export function makeTheme(
   );
 
   return resume => {
-    return `\\documentclass{${allOptions.documentClass || 'article'}}
-${allOptions.preamble || ''}
+    return `\\documentclass{${allOptions.documentClass}}
+${allOptions.preamble}
 \\begin{document}
 ${allOptions.renderHeader(resume)}
 ${allOptions.renderSummary(resume.basics.summary)}
 ${allOptions.sections
-      .map(section =>
-        allOptions.sectionOptions[section].render(resume[section]),
-      )
+      .map(section => {
+        const renderOptions = allOptions.sectionOptions[section];
+        return renderOptions && renderOptions.render(resume[section]);
+      })
       .join('\n')}
 \\end{document}
 `;
