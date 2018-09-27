@@ -4,7 +4,9 @@
  * @copyright 2018 Ian Johnson
  * @license MIT
  */
+import * as fs from 'fs';
 import moment from 'moment';
+import * as path from 'path';
 
 /**
  * The date format to use (moment.js; see
@@ -613,3 +615,14 @@ ${allOptions.sections
 `;
   };
 }
+
+// We need to "import" the preamble.
+const preamble = fs.readFileSync(path.join(__dirname, '..', 'preamble.tex'), {
+  encoding: 'UTF-8',
+});
+
+/**
+ * A render function using all the default options and the preamble included
+ * with this package.
+ */
+export const render = makeTheme({ preamble });
