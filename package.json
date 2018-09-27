@@ -8,6 +8,7 @@
     "build": "tsc",
     "check-style": "prettier -l lib/**/*.ts",
     "lint": "tslint -p tsconfig.json",
+    "prepare": "tsc",
     "test": "run-s check-style lint"
   },
   "repository": "https://github.com/ianprime0509/jsonresume-theme-latex",
