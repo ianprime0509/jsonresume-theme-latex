@@ -499,11 +499,11 @@ export interface RenderOptions {
   /**
    * The documentclass to use for the output.
    */
-  documentClass: string;
+  documentClass?: string;
   /**
    * The preamble to use in the output.
    */
-  preamble: string;
+  preamble?: string;
   /**
    * The sections to output, in the order they should appear.
    */
@@ -529,9 +529,8 @@ export interface RenderOptions {
 /**
  * The default options to use for the renderer.
  */
-export const defaultOptions: RenderOptions = {
+export const defaultOptions: Readonly<RenderOptions> = Object.freeze({
   documentClass: 'article',
-  preamble: '',
   renderHeader,
   renderSummary,
   sectionOptions: {
@@ -578,7 +577,7 @@ export const defaultOptions: RenderOptions = {
     'references',
     'projects',
   ],
-};
+});
 
 export type RenderFunction = (resume: any) => string;
 
@@ -592,12 +591,16 @@ export type RenderFunction = (resume: any) => string;
 export function makeTheme(
   options: Partial<RenderOptions> = defaultOptions,
 ): RenderFunction {
-  // Provide values for unspecified options.
-  const allOptions: RenderOptions = Object.assign(defaultOptions, options);
+  // Provide values for unspecified options. We need to make a shallow clone of
+  // defaultOptions here, since Object.assign mutates the given object.
+  const allOptions: RenderOptions = Object.assign(
+    { ...defaultOptions },
+    options,
+  );
 
   return resume => {
-    return `\\documentclass{${allOptions.documentClass}}
-${allOptions.preamble}
+    return `\\documentclass{${allOptions.documentClass || 'article'}}
+${allOptions.preamble || ''}
 \\begin{document}
 ${allOptions.renderHeader(resume)}
 ${allOptions.renderSummary(resume.basics.summary)}
