@@ -9,15 +9,15 @@ import moment from 'moment';
 import * as path from 'path';
 
 import {
-  Awards,
+  Award,
   Education,
-  Interests,
+  Interest,
   JSONResume as Resume,
-  Languages,
-  Projects,
-  Publications,
-  References,
-  Skills,
+  Language,
+  Project,
+  Publication,
+  Reference,
+  Skill,
   Volunteer,
   Work,
 } from '@ianprime0509/jsonresume-schema';
@@ -159,7 +159,7 @@ export function renderSummary(summary: string): string {
  * @param work the work section of the resume
  * @returns the formatted section
  */
-export function renderWork(work?: Work): string {
+export function renderWork(work?: Work[]): string {
   if (!work) {
     return '% Work section omitted.';
   }
@@ -215,7 +215,7 @@ export function renderWork(work?: Work): string {
  * @param work the volunteer section of the resume
  * @returns the formatted section
  */
-export function renderVolunteer(volunteer?: Volunteer): string {
+export function renderVolunteer(volunteer?: Volunteer[]): string {
   if (!volunteer) {
     return '% Volunteer section omitted.';
   }
@@ -273,7 +273,7 @@ export function renderVolunteer(volunteer?: Volunteer): string {
  * @param education the education section of the resume
  * @returns the formatted section
  */
-export function renderEducation(education?: Education): string {
+export function renderEducation(education?: Education[]): string {
   if (!education) {
     return '% Education section omitted.';
   }
@@ -316,7 +316,7 @@ export function renderEducation(education?: Education): string {
  * @param awards the awards section of the resume
  * @returns the formatted section
  */
-export function renderAwards(awards?: Awards): string {
+export function renderAwards(awards?: Award[]): string {
   if (!awards) {
     return '% Awards section omitted.';
   }
@@ -344,7 +344,7 @@ export function renderAwards(awards?: Awards): string {
  * @param publications the publications section of the resume
  * @returns the formatted section
  */
-export function renderPublications(publications?: Publications): string {
+export function renderPublications(publications?: Publication[]): string {
   if (!publications) {
     return '% Publications section omitted.';
   }
@@ -375,7 +375,7 @@ export function renderPublications(publications?: Publications): string {
  * @param skills the skills section of the resume
  * @returns the formatted section
  */
-export function renderSkills(skills?: Skills): string {
+export function renderSkills(skills?: Skill[]): string {
   if (!skills) {
     return '% Skills section omitted.';
   }
@@ -397,7 +397,7 @@ export function renderSkills(skills?: Skills): string {
  * @param languages the languages section of the resume
  * @returns the formatted section
  */
-export function renderLanguages(languages?: Languages): string {
+export function renderLanguages(languages?: Language[]): string {
   if (!languages) {
     return '% Languages section omitted.';
   }
@@ -419,7 +419,7 @@ export function renderLanguages(languages?: Languages): string {
  * @param interests the interests section of the resume
  * @returns the formatted section
  */
-export function renderInterests(interests?: Interests): string {
+export function renderInterests(interests?: Interest[]): string {
   if (!interests) {
     return '% Interests section omitted.';
   }
@@ -436,7 +436,7 @@ export function renderInterests(interests?: Interests): string {
  * @param references the references section of the resume
  * @returns the formatted section
  */
-export function renderReferences(references?: References): string {
+export function renderReferences(references?: Reference[]): string {
   if (!references) {
     return '% References section omitted.';
   }
@@ -456,7 +456,7 @@ export function renderReferences(references?: References): string {
  * @param projects the projects section of the resume
  * @returns the formatted section
  */
-export function renderProjects(projects?: Projects): string {
+export function renderProjects(projects?: Project[]): string {
   if (!projects) {
     return '% Projects section omitted.';
   }
@@ -533,17 +533,17 @@ export interface RenderOptions {
    * The options for each section.
    */
   sectionOptions: {
-    awards?: SectionOptions<Awards>;
-    education?: SectionOptions<Education>;
-    interests?: SectionOptions<Interests>;
-    languages?: SectionOptions<Languages>;
-    projects?: SectionOptions<Projects>;
-    publications?: SectionOptions<Publications>;
-    references?: SectionOptions<References>;
-    skills?: SectionOptions<Skills>;
-    volunteer?: SectionOptions<Volunteer>;
-    work?: SectionOptions<Work>;
-    [section: string]: SectionOptions<any> | undefined;
+    awards?: SectionOptions<Award[]>;
+    education?: SectionOptions<Education[]>;
+    interests?: SectionOptions<Interest[]>;
+    languages?: SectionOptions<Language[]>;
+    projects?: SectionOptions<Project[]>;
+    publications?: SectionOptions<Publication[]>;
+    references?: SectionOptions<Reference[]>;
+    skills?: SectionOptions<Skill[]>;
+    volunteer?: SectionOptions<Volunteer[]>;
+    work?: SectionOptions<Work[]>;
+    [section: string]: SectionOptions<any[]> | undefined;
   };
   /**
    * The function to use for rendering the header.
