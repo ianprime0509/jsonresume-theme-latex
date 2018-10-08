@@ -8,6 +8,7 @@
     "strict": true,
     "lib": ["es2015"],
     "types": ["node"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "resolveJsonModule": true
   }
 }
