@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Render functions throw errors on invalid resume input
+
 ## [0.1.1] - 2018-09-27
 
 ### Added

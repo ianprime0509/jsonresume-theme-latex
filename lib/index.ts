@@ -18,6 +18,7 @@ import {
   Publication,
   Reference,
   Skill,
+  validate,
   Volunteer,
   Work,
 } from '@ianprime0509/jsonresume-schema';
@@ -633,6 +634,11 @@ export function makeTheme(
   );
 
   return resume => {
+    const validationErrors = validate(resume);
+    if (validationErrors.length !== 0) {
+      throw new Error(`Invalid resume input: ${validationErrors.join(', ')}`);
+    }
+
     return `\\documentclass{${allOptions.documentClass}}
 ${allOptions.preamble}
 \\begin{document}
