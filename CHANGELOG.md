@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [0.1.2] - 2020-06-30
+
 ### Changed
 
 - Update dependencies
