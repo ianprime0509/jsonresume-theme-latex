@@ -47,7 +47,7 @@ export function escape(str: string): string {
   };
   const escapeRegex = new RegExp(Object.keys(escapes).join('|'), 'g');
 
-  return str.replace(escapeRegex, matched => escapes[matched]);
+  return str.replace(escapeRegex, (matched) => escapes[matched]);
 }
 
 /**
@@ -59,7 +59,7 @@ export function escape(str: string): string {
 export function indent(code: string): string {
   return code
     .split('\n')
-    .map(str => (str === '' ? '' : '  ' + str))
+    .map((str) => (str === '' ? '' : '  ' + str))
     .join('\n');
 }
 
@@ -76,7 +76,7 @@ export function useEnvironment(
   code: string,
   ...args: string[]
 ): string {
-  return `\\begin{${env}}${args.map(arg => `{${arg}}`).join('')}
+  return `\\begin{${env}}${args.map((arg) => `{${arg}}`).join('')}
 ${indent(code)}
 \\end{${env}}`;
 }
@@ -165,7 +165,7 @@ export function renderWork(work?: Work[]): string {
     return '% Work section omitted.';
   }
 
-  const formattedJobs = work.map(job => {
+  const formattedJobs = work.map((job) => {
     const startDate = moment(job.startDate).format(DATE_FORMAT);
     const endDate = job.endDate
       ? moment(job.endDate).format(DATE_FORMAT)
@@ -198,7 +198,7 @@ export function renderWork(work?: Work[]): string {
         useEnvironment(
           'jobhighlights',
           (job.highlights as string[])
-            .map(highlight => `\\item ${escape(highlight)}`)
+            .map((highlight) => `\\item ${escape(highlight)}`)
             .join('\n'),
         ),
       );
@@ -221,7 +221,7 @@ export function renderVolunteer(volunteer?: Volunteer[]): string {
     return '% Volunteer section omitted.';
   }
 
-  const formattedPositions = volunteer.map(position => {
+  const formattedPositions = volunteer.map((position) => {
     const startDate = moment(position.startDate).format(DATE_FORMAT);
     const endDate = position.endDate
       ? moment(position.endDate).format(DATE_FORMAT)
@@ -256,7 +256,7 @@ export function renderVolunteer(volunteer?: Volunteer[]): string {
         useEnvironment(
           'positionhighlights',
           (position.highlights as string[])
-            .map(highlight => `\\item ${escape(highlight)}`)
+            .map((highlight) => `\\item ${escape(highlight)}`)
             .join('\n'),
         ),
       );
@@ -279,7 +279,7 @@ export function renderEducation(education?: Education[]): string {
     return '% Education section omitted.';
   }
 
-  const formattedSchools = education.map(school => {
+  const formattedSchools = education.map((school) => {
     const startDate = moment(school.startDate).format(DATE_FORMAT);
     const endDate = school.endDate
       ? moment(school.endDate).format(DATE_FORMAT)
@@ -301,7 +301,7 @@ export function renderEducation(education?: Education[]): string {
     const schoolInfo = school.courses
       ? useEnvironment(
           'courses',
-          school.courses.map(course => `\\item ${escape(course)}`).join('\n'),
+          school.courses.map((course) => `\\item ${escape(course)}`).join('\n'),
         )
       : '';
 
@@ -322,7 +322,7 @@ export function renderAwards(awards?: Award[]): string {
     return '% Awards section omitted.';
   }
 
-  const formattedAwards = awards.map(award => {
+  const formattedAwards = awards.map((award) => {
     const date = moment(award.date).format(DATE_FORMAT);
     // Arguments to the award environment:
     // 1. Award title
@@ -350,7 +350,7 @@ export function renderPublications(publications?: Publication[]): string {
     return '% Publications section omitted.';
   }
 
-  const formattedPublications = publications.map(publication => {
+  const formattedPublications = publications.map((publication) => {
     const title = publication.url
       ? `\\href{${publication.url}}{${escape(publication.name || 'Untitled')}}`
       : escape(publication.name || 'Untitled');
@@ -381,7 +381,7 @@ export function renderSkills(skills?: Skill[]): string {
     return '% Skills section omitted.';
   }
 
-  const formattedSkills = skills.map(skill => {
+  const formattedSkills = skills.map((skill) => {
     let content = skill.name;
     if (skill.level) {
       content += ` (${skill.level})`;
@@ -403,7 +403,7 @@ export function renderLanguages(languages?: Language[]): string {
     return '% Languages section omitted.';
   }
 
-  const formattedLanguages = languages.map(language => {
+  const formattedLanguages = languages.map((language) => {
     let content = language.language;
     if (language.fluency) {
       content += ` (${language.fluency})`;
@@ -426,7 +426,7 @@ export function renderInterests(interests?: Interest[]): string {
   }
 
   const formattedInterests = interests.map(
-    interest => `\\item ${escape(interest.name)}`,
+    (interest) => `\\item ${escape(interest.name)}`,
   );
   return useEnvironment('interests', formattedInterests.join('\n'));
 }
@@ -443,7 +443,7 @@ export function renderReferences(references?: Reference[]): string {
   }
 
   const formattedReferences = references.map(
-    reference =>
+    (reference) =>
       `\\reference{${escape(reference.name || 'Undisclosed name')}} ${escape(
         reference.reference || '',
       )}`,
@@ -461,7 +461,7 @@ export function renderProjects(projects?: Project[]): string {
   if (!projects) {
     return '% Projects section omitted.';
   }
-  const formattedProjects = projects.map(project => {
+  const formattedProjects = projects.map((project) => {
     const name = project.url
       ? `\\href{${project.url}}{${escape(project.name || 'Untitled')}}`
       : escape(project.name || 'Untitled');
@@ -491,7 +491,7 @@ export function renderProjects(projects?: Project[]): string {
         useEnvironment(
           'projecthighlights',
           (project.highlights as string[])
-            .map(highlight => `\\item ${escape(highlight)}`)
+            .map((highlight) => `\\item ${escape(highlight)}`)
             .join('\n'),
         ),
       );
@@ -633,7 +633,7 @@ export function makeTheme(
     options,
   );
 
-  return resume => {
+  return (resume) => {
     const validationErrors = validate(resume);
     if (validationErrors.length !== 0) {
       throw new Error(`Invalid resume input: ${validationErrors.join(', ')}`);
@@ -645,11 +645,11 @@ ${allOptions.preamble}
 ${allOptions.renderHeader(resume)}
 ${allOptions.renderSummary(resume.basics.summary)}
 ${allOptions.sections
-      .map(section => {
-        const renderOptions = allOptions.sectionOptions[section];
-        return renderOptions && renderOptions.render(resume[section]);
-      })
-      .join('\n')}
+  .map((section) => {
+    const renderOptions = allOptions.sectionOptions[section];
+    return renderOptions && renderOptions.render(resume[section]);
+  })
+  .join('\n')}
 \\end{document}
 `;
   };
@@ -657,7 +657,7 @@ ${allOptions.sections
 
 // We need to "import" the preamble.
 const preamble = fs.readFileSync(path.join(__dirname, '..', 'preamble.tex'), {
-  encoding: 'UTF-8',
+  encoding: 'utf-8',
 });
 
 /**
